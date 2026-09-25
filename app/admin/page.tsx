@@ -13,7 +13,7 @@ export default async function AdminPage() {
         <h1>Κάρτες ({cards.length})</h1>
         <div className="actions-row">
           <Link href="/admin/new" className="btn">+ Νέα κάρτα</Link>
-          <form action="/api/auth/logout" method="post" onSubmit={() => {}}>
+          <form action="/api/auth/logout" method="post">
             <LogoutButton />
           </form>
         </div>
