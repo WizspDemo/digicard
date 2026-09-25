@@ -6,6 +6,7 @@ RUN apk add --no-cache libc6-compat openssl
 FROM base AS deps
 WORKDIR /app
 COPY package.json ./
+COPY prisma ./prisma
 RUN npm install --no-audit --no-fund
 
 # ---- builder ----
