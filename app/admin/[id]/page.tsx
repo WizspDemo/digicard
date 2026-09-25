@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
-import CardForm from '../CardForm';
+import CardForm from '@/app/components/CardForm';
 
 export const dynamic = 'force-dynamic';
 

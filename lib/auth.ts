@@ -23,10 +23,15 @@ async function hmac(payload: string): Promise<string> {
   return toHex(sig);
 }
 
-export async function signSession(): Promise<string> {
-  const payload = `admin:${Date.now()}`;
-  const sig = await hmac(payload);
-  return btoa(`${payload}.${sig}`);
+export type SessionPayload = {
+  userId: string;
+  role: 'ADMIN' | 'USER';
+};
+
+export async function signSession(payload: SessionPayload): Promise<string> {
+  const raw = `${payload.userId}:${payload.role}:${Date.now()}`;
+  const sig = await hmac(raw);
+  return btoa(`${raw}.${sig}`);
 }
 
 function timingSafeEqualStr(a: string, b: string): boolean {
@@ -36,25 +41,22 @@ function timingSafeEqualStr(a: string, b: string): boolean {
   return result === 0;
 }
 
-export async function verifySession(token: string | undefined | null): Promise<boolean> {
-  if (!token) return false;
+export async function verifySession(token: string | undefined | null): Promise<SessionPayload | null> {
+  if (!token) return null;
   try {
     const decoded = atob(token);
     const idx = decoded.lastIndexOf('.');
-    if (idx === -1) return false;
+    if (idx === -1) return null;
     const payload = decoded.slice(0, idx);
     const sig = decoded.slice(idx + 1);
     const expected = await hmac(payload);
-    return timingSafeEqualStr(sig, expected);
+    if (!timingSafeEqualStr(sig, expected)) return null;
+    const [userId, role] = payload.split(':');
+    if (!userId || (role !== 'ADMIN' && role !== 'USER')) return null;
+    return { userId, role };
   } catch {
-    return false;
+    return null;
   }
-}
-
-export function checkPassword(input: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD || '';
-  if (!expected) return false;
-  return timingSafeEqualStr(input, expected);
 }
 
 export { SESSION_COOKIE };

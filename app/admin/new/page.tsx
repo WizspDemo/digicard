@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import CardForm from '../CardForm';
+import CardForm from '@/app/components/CardForm';
 
 export default function NewCardPage() {
   return (

@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!card) return {};
   return {
     title: `${card.fullName}${card.company ? ' · ' + card.company : ''}`,
-    description: card.jobTitle || 'Ψηφιακή επαγγελματική κάρτα'
+    description: card.headline || card.jobTitle || 'Ψηφιακή επαγγελματική κάρτα'
   };
 }
 
@@ -21,13 +21,27 @@ function initials(name: string) {
     .join('');
 }
 
+function formatAddress(card: {
+  addressStreet: string | null;
+  addressCity: string | null;
+  addressState: string | null;
+  addressPostalCode: string | null;
+  addressCountry: string | null;
+}) {
+  return [card.addressStreet, card.addressCity, card.addressState, card.addressPostalCode, card.addressCountry]
+    .filter(Boolean)
+    .join(', ');
+}
+
 export default async function CardPage({ params }: { params: { slug: string } }) {
   const card = await prisma.card.findUnique({ where: { slug: params.slug } });
   if (!card) notFound();
 
   const items: { label: string; value: string; href: string; icon: string }[] = [];
   if (card.phone) items.push({ label: 'Τηλέφωνο', value: card.phone, href: `tel:${card.phone}`, icon: '📞' });
+  if (card.phone2) items.push({ label: 'Τηλέφωνο 2', value: card.phone2, href: `tel:${card.phone2}`, icon: '📞' });
   if (card.email) items.push({ label: 'Email', value: card.email, href: `mailto:${card.email}`, icon: '✉️' });
+  if (card.email2) items.push({ label: 'Email 2', value: card.email2, href: `mailto:${card.email2}`, icon: '✉️' });
   if (card.whatsapp)
     items.push({
       label: 'WhatsApp',
@@ -35,14 +49,22 @@ export default async function CardPage({ params }: { params: { slug: string } })
       href: `https://wa.me/${card.whatsapp.replace(/[^0-9]/g, '')}`,
       icon: '💬'
     });
-  if (card.linkedin) items.push({ label: 'LinkedIn', value: card.linkedin.replace(/^https?:\/\//, ''), href: card.linkedin, icon: '💼' });
   if (card.website) items.push({ label: 'Ιστοσελίδα', value: card.website.replace(/^https?:\/\//, ''), href: card.website, icon: '🌐' });
-  if (card.address) items.push({ label: 'Διεύθυνση', value: card.address, href: `https://maps.google.com/?q=${encodeURIComponent(card.address)}`, icon: '📍' });
+  const address = formatAddress(card);
+  if (address) items.push({ label: 'Διεύθυνση', value: address, href: `https://maps.google.com/?q=${encodeURIComponent(address)}`, icon: '📍' });
+
+  const socials: { label: string; href: string; icon: string }[] = [];
+  if (card.linkedin) socials.push({ label: 'LinkedIn', href: card.linkedin, icon: '💼' });
+  if (card.instagram) socials.push({ label: 'Instagram', href: card.instagram, icon: '📷' });
+  if (card.facebook) socials.push({ label: 'Facebook', href: card.facebook, icon: '👍' });
+  if (card.tiktok) socials.push({ label: 'TikTok', href: card.tiktok, icon: '🎵' });
+  if (card.telegram) socials.push({ label: 'Telegram', href: card.telegram, icon: '✈️' });
+  if (card.twitter) socials.push({ label: 'X / Twitter', href: card.twitter, icon: '✖️' });
 
   return (
     <div className="wrap">
       <div className="card-page" style={{ ['--accent-color' as any]: card.themeColor || '#6d28d9' }}>
-        <div className="cover">
+        <div className="cover" style={card.coverUrl ? { backgroundImage: `url(${card.coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
           {card.photoUrl ? (
             <img className="avatar" src={card.photoUrl} alt={card.fullName} />
           ) : (
@@ -70,11 +92,22 @@ export default async function CardPage({ params }: { params: { slug: string } })
               {card.company}
             </p>
           )}
+          {card.headline && <p className="headline">{card.headline}</p>}
         </div>
 
         <a className="save-btn" href={`/u/${card.slug}/vcard.vcf`}>
           ⬇️ Αποθήκευση στις Επαφές
         </a>
+
+        {socials.length > 0 && (
+          <div className="social-row">
+            {socials.map((s) => (
+              <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer" title={s.label}>
+                {s.icon}
+              </a>
+            ))}
+          </div>
+        )}
 
         <div className="contact-list">
           {items.map((it) => (

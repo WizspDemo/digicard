@@ -1,10 +1,17 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
+import { requireUser } from '@/lib/session';
 import DeleteButton from './DeleteButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
+  const session = await requireUser();
+  if (!session || session.role !== 'ADMIN') redirect('/login');
+  const me = await prisma.user.findUnique({ where: { id: session.userId } });
+  if (me?.mustChangePassword) redirect('/change-password');
+
   const cards = await prisma.card.findMany({ orderBy: { createdAt: 'desc' } });
 
   return (
@@ -12,6 +19,7 @@ export default async function AdminPage() {
       <div className="admin-header">
         <h1>Κάρτες ({cards.length})</h1>
         <div className="actions-row">
+          <Link href="/admin/users" className="btn secondary">👥 Χρήστες</Link>
           <Link href="/admin/new" className="btn">+ Νέα κάρτα</Link>
           <form action="/api/auth/logout" method="post">
             <LogoutButton />

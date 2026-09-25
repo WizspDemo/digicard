@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { checkPassword, signSession, SESSION_COOKIE } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { verifyPassword } from '@/lib/password';
+import { signSession, SESSION_COOKIE } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json().catch(() => ({ password: '' }));
-  if (typeof password !== 'string' || !checkPassword(password)) {
+  const { email, password } = await req.json().catch(() => ({ email: '', password: '' }));
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
     return NextResponse.json({ error: 'invalid' }, { status: 401 });
   }
-  const token = await signSession();
-  const res = NextResponse.json({ ok: true });
+
+  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+  if (!user || !verifyPassword(password, user.passwordHash)) {
+    return NextResponse.json({ error: 'invalid' }, { status: 401 });
+  }
+
+  const token = await signSession({ userId: user.id, role: user.role as 'ADMIN' | 'USER' });
+  const res = NextResponse.json({
+    ok: true,
+    role: user.role,
+    mustChangePassword: user.mustChangePassword
+  });
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',

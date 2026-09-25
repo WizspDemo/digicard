@@ -1,0 +1,31 @@
+export function cardDataFromBody(body: any, slug?: string) {
+  return {
+    ...(slug ? { slug } : {}),
+    fullName: body.fullName,
+    headline: body.headline || null,
+    jobTitle: body.jobTitle || null,
+    company: body.company || null,
+    phone: body.phone || null,
+    phone2: body.phone2 || null,
+    email: body.email || null,
+    email2: body.email2 || null,
+    whatsapp: body.whatsapp || null,
+    linkedin: body.linkedin || null,
+    website: body.website || null,
+    instagram: body.instagram || null,
+    facebook: body.facebook || null,
+    tiktok: body.tiktok || null,
+    telegram: body.telegram || null,
+    twitter: body.twitter || null,
+    addressStreet: body.addressStreet || null,
+    addressCity: body.addressCity || null,
+    addressState: body.addressState || null,
+    addressPostalCode: body.addressPostalCode || null,
+    addressCountry: body.addressCountry || null,
+    birthday: body.birthday || null,
+    photoUrl: body.photoUrl || null,
+    coverUrl: body.coverUrl || null,
+    logoUrl: body.logoUrl || null,
+    themeColor: body.themeColor || '#6d28d9'
+  };
+}

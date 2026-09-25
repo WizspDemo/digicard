@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 function LoginForm() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,14 +18,19 @@ function LoginForm() {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
+      body: JSON.stringify({ email, password })
     });
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (res.ok) {
-      router.push(params.get('next') || '/admin');
+      if (data.mustChangePassword) {
+        router.push('/change-password');
+      } else {
+        router.push(params.get('next') || (data.role === 'ADMIN' ? '/admin' : '/dashboard'));
+      }
       router.refresh();
     } else {
-      setError('Λάθος κωδικός.');
+      setError('Λάθος email ή κωδικός.');
     }
   }
 
@@ -34,12 +40,20 @@ function LoginForm() {
       {error && <div className="error-msg">{error}</div>}
       <form onSubmit={onSubmit}>
         <div className="field" style={{ marginBottom: 16 }}>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="field" style={{ marginBottom: 16 }}>
           <label>Κωδικός πρόσβασης</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoFocus
           />
         </div>
         <button className="btn" style={{ width: '100%' }} disabled={loading}>

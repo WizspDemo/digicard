@@ -7,20 +7,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  passwordHash       String
+  role               String   @default("USER") // "ADMIN" | "USER"
+  mustChangePassword Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  card               Card?
+}
+
 model Card {
   id        String   @id @default(cuid())
   slug      String   @unique
+  userId    String?  @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   fullName  String
+  headline  String?
   jobTitle  String?
   company   String?
+
   phone     String?
+  phone2    String?
   email     String?
+  email2    String?
   whatsapp  String?
   linkedin  String?
   website   String?
-  address   String?
+
+  instagram String?
+  facebook  String?
+  tiktok    String?
+  telegram  String?
+  twitter   String?
+
+  addressStreet     String?
+  addressCity       String?
+  addressState      String?
+  addressPostalCode String?
+  addressCountry    String?
+
+  birthday  String?
+
   photoUrl  String?
+  coverUrl  String?
   logoUrl   String?
+
   themeColor String? @default("#6d28d9")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

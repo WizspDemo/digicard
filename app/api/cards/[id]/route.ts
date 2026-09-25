@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifySession, SESSION_COOKIE } from '@/lib/auth';
 import { slugify } from '@/lib/slug';
+import { cardDataFromBody } from '@/lib/card-data';
 
-function requireAuth(req: NextRequest) {
+async function requireAdmin(req: NextRequest) {
   const token = req.cookies.get(SESSION_COOKIE)?.value;
-  return verifySession(token);
+  const session = await verifySession(token);
+  return session?.role === 'ADMIN';
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  if (!(await requireAuth(req))) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!(await requireAdmin(req))) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   if (!body.fullName) return NextResponse.json({ error: 'fullName is required' }, { status: 400 });
 
@@ -29,27 +31,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const card = await prisma.card.update({
     where: { id: params.id },
-    data: {
-      slug: finalSlug,
-      fullName: body.fullName,
-      jobTitle: body.jobTitle || null,
-      company: body.company || null,
-      phone: body.phone || null,
-      email: body.email || null,
-      whatsapp: body.whatsapp || null,
-      linkedin: body.linkedin || null,
-      website: body.website || null,
-      address: body.address || null,
-      photoUrl: body.photoUrl || null,
-      logoUrl: body.logoUrl || null,
-      themeColor: body.themeColor || '#6d28d9'
-    }
+    data: cardDataFromBody(body, finalSlug)
   });
   return NextResponse.json(card);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  if (!(await requireAuth(req))) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!(await requireAdmin(req))) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   await prisma.card.delete({ where: { id: params.id } }).catch(() => null);
   return NextResponse.json({ ok: true });
 }
