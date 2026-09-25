@@ -20,6 +20,7 @@ export default async function AdminPage() {
         <h1>Κάρτες ({cards.length})</h1>
         <div className="actions-row">
           <Link href="/admin/users" className="btn secondary">👥 Χρήστες</Link>
+          <Link href="/change-password" className="btn secondary">Αλλαγή κωδικού</Link>
           <Link href="/admin/new" className="btn">+ Νέα κάρτα</Link>
           <form action="/api/auth/logout" method="post">
             <LogoutButton />

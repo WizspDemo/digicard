@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Card } from '@prisma/client';
 
@@ -41,28 +41,88 @@ const SECTIONS: { title: string; fields: FieldDef[] }[] = [
     ]
   },
   {
-    title: 'Διεύθυνση',
+    title: 'Διεύθυνση & λοιπές πληροφορίες',
     fields: [
       { key: 'addressStreet', label: 'Οδός & αριθμός', full: true },
       { key: 'addressCity', label: 'Πόλη' },
       { key: 'addressState', label: 'Νομός / Περιοχή' },
       { key: 'addressPostalCode', label: 'Τ.Κ.' },
-      { key: 'addressCountry', label: 'Χώρα' }
-    ]
-  },
-  {
-    title: 'Λοιπά',
-    fields: [{ key: 'birthday', label: 'Γενέθλια', type: 'date' }]
-  },
-  {
-    title: 'Εικόνες',
-    fields: [
-      { key: 'photoUrl', label: 'URL φωτογραφίας προφίλ (avatar)', type: 'url', full: true },
-      { key: 'coverUrl', label: 'URL εικόνας εξωφύλλου (cover)', type: 'url', full: true },
-      { key: 'logoUrl', label: 'URL λογότυπου εταιρείας', type: 'url', full: true }
+      { key: 'addressCountry', label: 'Χώρα' },
+      { key: 'birthday', label: 'Γενέθλια', type: 'date' }
     ]
   }
 ];
+
+const IMAGE_FIELDS: { key: keyof FormState; label: string }[] = [
+  { key: 'photoUrl', label: 'Φωτογραφία προφίλ (avatar)' },
+  { key: 'coverUrl', label: 'Εικόνα εξωφύλλου (cover)' },
+  { key: 'logoUrl', label: 'Λογότυπο εταιρείας' }
+];
+
+function ImageUploadField({
+  label,
+  value,
+  onChange
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    const body = new FormData();
+    body.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body });
+    setUploading(false);
+    if (res.ok) {
+      const data = await res.json();
+      onChange(data.url);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error || 'Η μεταφόρτωση απέτυχε.');
+    }
+  }
+
+  return (
+    <div className="field full image-field">
+      <label>{label}</label>
+      {error && <div className="error-msg" style={{ marginBottom: 8 }}>{error}</div>}
+      <div className="image-field-row">
+        {value && <img src={value} alt="" className="image-preview" />}
+        <div style={{ flex: 1 }}>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            onChange={onFileChange}
+            style={{ marginBottom: 8 }}
+          />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="url"
+              placeholder="ή επικόλλησε URL εικόνας"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            />
+            {value && (
+              <button type="button" className="btn secondary" onClick={() => onChange('')}>
+                Αφαίρεση
+              </button>
+            )}
+          </div>
+          {uploading && <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>Μεταφόρτωση...</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CardForm({
   initial,
@@ -118,6 +178,21 @@ export default function CardForm({
     <form onSubmit={onSubmit}>
       {error && <div className="error-msg">{error}</div>}
       {saved && hideSlug && <div className="success-msg">Οι αλλαγές αποθηκεύτηκαν.</div>}
+
+      <div className="form-section">
+        <h3 className="form-section-title">Εικόνες</h3>
+        <div className="form-grid">
+          {IMAGE_FIELDS.map((f) => (
+            <ImageUploadField
+              key={f.key}
+              label={f.label}
+              value={(form[f.key] as string) || ''}
+              onChange={(v) => update(f.key, v)}
+            />
+          ))}
+        </div>
+      </div>
+
       {SECTIONS.map((section) => (
         <div key={section.title} className="form-section">
           <h3 className="form-section-title">{section.title}</h3>

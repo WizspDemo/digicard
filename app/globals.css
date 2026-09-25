@@ -109,6 +109,54 @@ a { color: inherit; text-decoration: none; }
   font-size: 18px;
 }
 
+.tabs-wrap { padding: 4px 0 8px; }
+
+.tabs-bar {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px 12px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  flex: 1;
+  white-space: nowrap;
+  background: #f2f2f7;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: var(--accent-color, var(--accent));
+  color: #fff;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 14px;
+  padding: 4px 20px 28px;
+}
+
+.social-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.social-card span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+}
+
 .logo-inline {
   width: 28px;
   height: 28px;
@@ -272,6 +320,21 @@ input[type=color] {
 }
 
 .field { margin-bottom: 0; }
+
+.image-field-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.image-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #f1f1f6;
+  flex-shrink: 0;
+}
 
 .login-card {
   background: #fff;

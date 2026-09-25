@@ -33,6 +33,9 @@ export default async function DashboardPage() {
           <Link href={`/dashboard/qr`} className="btn secondary">
             QR κώδικας
           </Link>
+          <Link href="/change-password" className="btn secondary">
+            Αλλαγή κωδικού
+          </Link>
           <form action="/api/auth/logout" method="post">
             <button className="btn secondary" type="submit" formAction="/api/auth/logout">
               Αποσύνδεση
