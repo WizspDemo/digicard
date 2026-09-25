@@ -26,6 +26,6 @@ export function cardDataFromBody(body: any, slug?: string) {
     photoUrl: body.photoUrl || null,
     coverUrl: body.coverUrl || null,
     logoUrl: body.logoUrl || null,
-    themeColor: body.themeColor || '#6d28d9'
+    themeColor: body.themeColor || '#5b3df5'
   };
 }

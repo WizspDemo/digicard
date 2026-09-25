@@ -132,7 +132,7 @@ export default function CardForm({
   hideSlug?: boolean;
 }) {
   const [form, setForm] = useState<FormState>(
-    initial || { themeColor: '#6d28d9', slug: '' }
+    initial || { themeColor: '#5b3df5', slug: '' }
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -228,7 +228,7 @@ export default function CardForm({
               <label>Χρώμα θέματος</label>
               <input
                 type="color"
-                value={form.themeColor || '#6d28d9'}
+                value={form.themeColor || '#5b3df5'}
                 onChange={(e) => update('themeColor', e.target.value)}
               />
             </div>
@@ -244,7 +244,7 @@ export default function CardForm({
               <label>Χρώμα θέματος</label>
               <input
                 type="color"
-                value={form.themeColor || '#6d28d9'}
+                value={form.themeColor || '#5b3df5'}
                 onChange={(e) => update('themeColor', e.target.value)}
               />
             </div>

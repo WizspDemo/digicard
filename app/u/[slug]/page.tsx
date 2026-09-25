@@ -27,46 +27,48 @@ export default async function CardPage({ params }: { params: { slug: string } })
   if (!card) notFound();
 
   return (
-    <div className="wrap">
-      <div className="card-page" style={{ ['--accent-color' as any]: card.themeColor || '#6d28d9' }}>
-        <div className="cover" style={card.coverUrl ? { backgroundImage: `url(${card.coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
-          {card.photoUrl ? (
-            <img className="avatar" src={card.photoUrl} alt={card.fullName} />
-          ) : (
-            <div
-              className="avatar"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 36,
-                fontWeight: 700,
-                color: card.themeColor || '#6d28d9'
-              }}
-            >
-              {initials(card.fullName)}
-            </div>
-          )}
-        </div>
-        <div className="identity">
-          <h1>{card.fullName}</h1>
-          {card.jobTitle && <p className="role">{card.jobTitle}</p>}
-          {card.company && (
-            <p className="company">
-              {card.logoUrl && <img className="logo-inline" src={card.logoUrl} alt="" />}
-              {card.company}
-            </p>
-          )}
-          {card.headline && <p className="headline">{card.headline}</p>}
-        </div>
+    <div className="public-shell">
+      <div className="wrap">
+        <div className="card-page" style={{ ['--accent-color' as any]: card.themeColor || '#5b3df5' }}>
+          <div className="cover" style={card.coverUrl ? { backgroundImage: `url(${card.coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+            {card.photoUrl ? (
+              <img className="avatar" src={card.photoUrl} alt={card.fullName} />
+            ) : (
+              <div
+                className="avatar"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 34,
+                  fontWeight: 700,
+                  color: card.themeColor || '#5b3df5'
+                }}
+              >
+                {initials(card.fullName)}
+              </div>
+            )}
+          </div>
+          <div className="identity">
+            <h1>{card.fullName}</h1>
+            {card.jobTitle && <p className="role">{card.jobTitle}</p>}
+            {card.company && (
+              <p className="company">
+                {card.logoUrl && <img className="logo-inline" src={card.logoUrl} alt="" />}
+                {card.company}
+              </p>
+            )}
+            {card.headline && <p className="headline">{card.headline}</p>}
+          </div>
 
-        <a className="save-btn" href={`/u/${card.slug}/vcard.vcf`}>
-          ⬇️ Αποθήκευση στις Επαφές
-        </a>
+          <a className="save-btn" href={`/u/${card.slug}/vcard.vcf`}>
+            Αποθήκευση στις Επαφές
+          </a>
 
-        <CardTabs card={card} />
+          <CardTabs card={card} />
+        </div>
+        <p className="footer-note">Ψηφιακή επαγγελματική κάρτα · DigiCard</p>
       </div>
-      <p className="footer-note">Ψηφιακή επαγγελματική κάρτα · DigiCard</p>
     </div>
   );
 }

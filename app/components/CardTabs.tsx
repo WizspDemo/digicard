@@ -12,6 +12,7 @@ import {
   WhatsAppIcon,
   GlobeIcon
 } from './SocialIcons';
+import { PhoneIcon, MailIcon, GlobeLineIcon, PinIcon, CakeIcon } from './UtilityIcons';
 
 function formatAddress(card: {
   addressStreet: string | null;
@@ -32,12 +33,12 @@ function formatBirthday(input: string) {
 }
 
 export default function CardTabs({ card }: { card: Card }) {
-  const contactItems: { label: string; value: string; href: string; icon: string }[] = [];
-  if (card.phone) contactItems.push({ label: 'Τηλέφωνο', value: card.phone, href: `tel:${card.phone}`, icon: '📞' });
-  if (card.phone2) contactItems.push({ label: 'Τηλέφωνο 2', value: card.phone2, href: `tel:${card.phone2}`, icon: '📞' });
-  if (card.email) contactItems.push({ label: 'Email', value: card.email, href: `mailto:${card.email}`, icon: '✉️' });
-  if (card.email2) contactItems.push({ label: 'Email 2', value: card.email2, href: `mailto:${card.email2}`, icon: '✉️' });
-  if (card.website) contactItems.push({ label: 'Ιστοσελίδα', value: card.website.replace(/^https?:\/\//, ''), href: card.website, icon: '🌐' });
+  const contactItems: { label: string; value: string; href: string; Icon: any }[] = [];
+  if (card.phone) contactItems.push({ label: 'Τηλέφωνο', value: card.phone, href: `tel:${card.phone}`, Icon: PhoneIcon });
+  if (card.phone2) contactItems.push({ label: 'Τηλέφωνο 2', value: card.phone2, href: `tel:${card.phone2}`, Icon: PhoneIcon });
+  if (card.email) contactItems.push({ label: 'Email', value: card.email, href: `mailto:${card.email}`, Icon: MailIcon });
+  if (card.email2) contactItems.push({ label: 'Email 2', value: card.email2, href: `mailto:${card.email2}`, Icon: MailIcon });
+  if (card.website) contactItems.push({ label: 'Ιστοσελίδα', value: card.website.replace(/^https?:\/\//, ''), href: card.website, Icon: GlobeLineIcon });
 
   const socials: { label: string; href: string; Icon: any }[] = [];
   if (card.whatsapp) socials.push({ label: 'WhatsApp', href: `https://wa.me/${card.whatsapp.replace(/[^0-9]/g, '')}`, Icon: WhatsAppIcon });
@@ -80,7 +81,7 @@ export default function CardTabs({ card }: { card: Card }) {
         <div className="contact-list">
           {contactItems.map((it) => (
             <a key={it.label} className="contact-item" href={it.href} target={it.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
-              <div className="icon">{it.icon}</div>
+              <div className="icon"><it.Icon size={18} /></div>
               <div className="info">
                 <div className="label">{it.label}</div>
                 <div className="value">{it.value}</div>
@@ -110,7 +111,7 @@ export default function CardTabs({ card }: { card: Card }) {
               target="_blank"
               rel="noreferrer"
             >
-              <div className="icon">📍</div>
+              <div className="icon"><PinIcon size={18} /></div>
               <div className="info">
                 <div className="label">Διεύθυνση</div>
                 <div className="value">{address}</div>
@@ -119,7 +120,7 @@ export default function CardTabs({ card }: { card: Card }) {
           )}
           {card.birthday && (
             <div className="contact-item">
-              <div className="icon">🎂</div>
+              <div className="icon"><CakeIcon size={18} /></div>
               <div className="info">
                 <div className="label">Γενέθλια</div>
                 <div className="value">{formatBirthday(card.birthday)}</div>
